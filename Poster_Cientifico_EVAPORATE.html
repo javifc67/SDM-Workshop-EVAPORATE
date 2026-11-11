@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Póster Científico - EVAPORATE (PVLDB 2023)</title>
+<style>
+  @page {
+    size: 420mm 297mm; /* A3 Landscape (proporcional a A0/A1 horizontal para proyección y póster) */
+    margin: 5mm 7mm 5mm 7mm;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #0f172a;
+    background: #f1f5f9;
+    margin: 0;
+    padding: 0;
+    font-size: 8.2pt;
+    line-height: 1.15;
+  }
+  /* HEADER BANNER */
+  .poster-header {
+    background: linear-gradient(135deg, #002b5c 0%, #004b93 60%, #0369a1 100%);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 7px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+  .header-left {
+    max-width: 73%;
+  }
+  .uni-bar {
+    font-size: 7.3pt;
+    text-transform: uppercase;
+    letter-spacing: 0.9px;
+    color: #bae6fd;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .poster-title {
+    font-size: 16.5pt;
+    font-weight: 800;
+    margin: 0 0 3px 0;
+    line-height: 1.15;
+    color: #ffffff;
+  }
+  .poster-authors {
+    font-size: 7.3pt;
+    color: #e0f2fe;
+    margin: 0;
+  }
+  .poster-authors a {
+    color: #7dd3fc;
+    text-decoration: underline;
+    font-weight: 700;
+  }
+  .header-right {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    padding: 7px 12px;
+    text-align: right;
+    min-width: 25%;
+  }
+  .badge-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-bottom: 4px;
+  }
+  .h-badge {
+    font-size: 7.2pt;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .hb-gold { background: #fde047; color: #713f12; }
+  .hb-green { background: #86efac; color: #14532d; }
+  .hb-cyan { background: #67e8f9; color: #083344; }
+  .group-box {
+    font-size: 7.3pt;
+    color: #f8fafc;
+    line-height: 1.3;
+  }
+
+  /* 3-COLUMN GRID */
+  .poster-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.12fr 1fr;
+    gap: 8px;
+    align-items: start;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* SECTION CARDS */
+  .card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    padding: 6.5px 9.5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .card-title {
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 9.8pt;
+    font-weight: 700;
+    padding: 4.5px 9px;
+    border-radius: 5px;
+    margin: -2px 0 6px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-title.blue { background: #003b7a; }
+  .card-title.teal { background: #0f766e; }
+  .card-title.indigo { background: #3730a3; }
+  .card-title.amber { background: #92400e; }
+  .card-title.slate { background: #1e293b; }
+  .card-title span.sec-num {
+    background: rgba(255,255,255,0.22);
+    font-size: 7.5pt;
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+
+  h4 {
+    margin: 3px 0 2px 0;
+    font-size: 8.8pt;
+    color: #003b7a;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 1px;
+  }
+  p {
+    margin: 0 0 4px 0;
+  }
+  ul {
+    margin: 0 0 4px 0;
+    padding-left: 14px;
+  }
+  li {
+    margin-bottom: 2.5px;
+  }
+  code {
+    font-family: "JetBrains Mono", Consolas, monospace;
+    font-size: 7.3pt;
+    background: #f1f5f9;
+    padding: 0.5px 3.5px;
+    border-radius: 3px;
+    color: #0f172a;
+  }
+
+  /* CALLOUT / FORMULA BOX */
+  .highlight-box {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-left: 3.5px solid #0284c7;
+    border-radius: 5px;
+    padding: 5px 8px;
+    margin: 4px 0;
+    font-size: 7.6pt;
+  }
+  .warn-box {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-left: 3.5px solid #d97706;
+    border-radius: 5px;
+    padding: 5px 8px;
+    margin: 4px 0;
+    font-size: 7.6pt;
+  }
+
+  /* TRIAD TRADEOFF */
+  .triad {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 5px;
+    margin: 3px 0;
+  }
+  .triad-item {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    padding: 2.5px 5px;
+    text-align: center;
+    font-size: 7.3pt;
+  }
+  .triad-item strong {
+    display: block;
+    color: #003b7a;
+    font-size: 8.3pt;
+    margin-bottom: 1px;
+  }
+
+  /* PIPELINE DIAGRAM */
+  .pipeline-box {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 3px 6px;
+    margin: 4px 0;
+  }
+  .pipe-steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .pipe-step {
+    background: #ffffff;
+    border: 1.5px solid #0284c7;
+    border-radius: 5px;
+    padding: 5px 6px;
+    font-size: 7.3pt;
+  }
+  .pipe-step .step-head {
+    font-weight: 800;
+    color: #0369a1;
+    font-size: 7.6pt;
+    margin-bottom: 2px;
+  }
+  .code-snippet {
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: Consolas, monospace;
+    font-size: 7.2pt;
+    padding: 2.5px 5px;
+    border-radius: 4px;
+    margin-top: 3px;
+    line-height: 1.22;
+  }
+  .code-snippet .kw { color: #38bdf8; }
+  .code-snippet .fn { color: #fde047; }
+  .code-snippet .st { color: #86efac; }
+
+  /* TABLES */
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7.7pt;
+    margin: 4px 0;
+  }
+  table.data-table th {
+    background: #1e293b;
+    color: #ffffff;
+    padding: 2px 4px;
+    text-align: center;
+    font-weight: 700;
+  }
+  table.data-table th:first-child,
+  table.data-table td:first-child {
+    text-align: left;
+  }
+  table.data-table td {
+    border: 1px solid #cbd5e1;
+    padding: 3px 5px;
+    text-align: center;
+  }
+  table.data-table tr:nth-child(even) {
+    background: #f8fafc;
+  }
+  table.data-table tr.row-win {
+    background: #dcfce7;
+    font-weight: 700;
+  }
+  .pos { color: #15803d; font-weight: 700; }
+  .neg { color: #b91c1c; font-weight: 700; }
+
+  /* KPI METRICS ROW */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin: 3px 0;
+  }
+  .kpi {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 1px solid #86efac;
+    border-radius: 5px;
+    padding: 2.5px 4px;
+    text-align: center;
+  }
+  .kpi .num {
+    font-size: 12pt;
+    font-weight: 800;
+    color: #166534;
+    line-height: 1.1;
+  }
+  .kpi .lbl {
+    font-size: 7pt;
+    color: #14532d;
+    font-weight: 600;
+  }
+
+  /* VISUAL BAR CHART */
+  .bar-chart {
+    margin: 4px 0;
+    font-size: 7.6pt;
+  }
+  .bar-row {
+    display: grid;
+    grid-template-columns: 105px 1fr 38px;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 1px;
+  }
+  .bar-track {
+    background: #e2e8f0;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 5px;
+  }
+  .bf-slate { background: #64748b; }
+  .bf-blue { background: #0284c7; }
+  .bf-green { background: #16a34a; }
+</style>
+</head>
+<body>
+
+<!-- ==================== CABECERA / SECCIÓN 1: IDENTIFICACIÓN ==================== -->
+<div class="poster-header">
+  <div class="header-left">
+    <div class="uni-bar">1. Identificación del Artículo · Scientific Workshop — Gestión de Sistemas de Datos Masivos (ETSISI - UPM)</div>
+    <h1 class="poster-title">Language Models Enable Simple Systems for Generating Structured Views of Heterogeneous Data Lakes (Sistema EVAPORATE)</h1>
+    <p class="poster-authors">
+      <strong>Autores del artículo:</strong> Simran Arora, Brandon Yang*, Sabri Eyuboglu*, Avanika Narayan, Andrew Hojel (<em>Stanford University</em>), Immanuel Trummer (<em>Cornell University</em>) y Christopher Ré (<em>Stanford University</em>)<br>
+      <strong>Publicación:</strong> <em>Proceedings of the VLDB Endowment (PVLDB)</em>, Vol. 17, No. 2, pp. 92–105, 2023 (ISSN: 2150-8097) ·
+      <strong>DOI:</strong> <a href="https://doi.org/10.14778/3626292.3626294">https://doi.org/10.14778/3626292.3626294</a> ·
+      <strong>PDF VLDB:</strong> <a href="https://www.vldb.org/pvldb/vol17/p92-arora.pdf">vldb.org/pvldb/vol17/p92-arora.pdf</a> ·
+      <strong>Código:</strong> <a href="https://github.com/HazyResearch/evaporate">github.com/HazyResearch/evaporate</a>
+    </p>
+  </div>
+  <div class="header-right">
+    <div class="badge-row">
+      <span class="h-badge hb-gold">Congreso CORE A*</span>
+      <span class="h-badge hb-green">Revista JCR Q1</span>
+      <span class="h-badge hb-cyan">Bloque I · Almacenamiento / ETL-ELT</span>
+    </div>
+    <div class="group-box">
+      <strong>Análisis realizado por (Grupo de Trabajo - UPM):</strong><br>
+      Integrantes: <em>[Añadir nombres de los 3–4 estudiantes del grupo]</em><br>
+      Máster Universitario en Aprendizaje Automático y Datos Masivos
+    </div>
+  </div>
+</div>
+
+<!-- ==================== GRID DE 3 COLUMNAS ==================== -->
+<div class="poster-grid">
+
+  <!-- ==================== COLUMNA 1: MOTIVACIÓN Y PROBLEMA + RELACIÓN CON LA ASIGNATURA ==================== -->
+  <div class="col">
+
+    <!-- SECCIÓN 2: MOTIVACIÓN Y PROBLEMA -->
+    <div class="card">
+      <div class="card-title blue">
+        <span>2. Motivación y Problema de Investigación</span>
+        <span class="sec-num">Apartado 2</span>
+      </div>
+      <p>
+        Las organizaciones almacenan información crítica en <strong>Data Lakes heterogéneos</strong> compuestos por millones de documentos no estructurados o semi-estructurados (páginas web HTML, informes médicos o regulatorios en PDF, correos en texto plano). En su estado crudo, <strong>estos datos no permiten ejecutar consultas analíticas SQL/OLAP</strong>.
+      </p>
+      <div class="highlight-box">
+        <strong>Definición formal del problema:</strong> Dada una colección de <em>n</em> documentos heterogéneos <em>D = {d₁, d₂, …, dₙ}</em> sin esquema previo, construir automáticamente una <strong>vista estructurada (tabla relacional)</strong> definida por un esquema de atributos <em>A = {a₁, …, aₘ}</em> y <em>n</em> registros extraídos <em>R = {r₁, …, rₙ}</em> (donde cada <em>rᵢ</em> es una <em>m</em>-tupla), <strong>sin entrenamiento específico de dominio ni etiquetado manual</strong>.
+      </div>
+
+      <h4>El Trilema de los Sistemas de Extracción e Ingesta</h4>
+      <div class="triad">
+        <div class="triad-item">
+          <strong>1. Generalidad</strong>
+          Soportar múltiples formatos (HTML, PDF, TXT) y dominios sin entrenar modelos ad-hoc.
+        </div>
+        <div class="triad-item">
+          <strong>2. Coste Escalable</strong>
+          Escalar a millones de documentos sin disparar el coste computacional ni monetario.
+        </div>
+        <div class="triad-item">
+          <strong>3. Calidad Analítica</strong>
+          Atributos de alta cobertura y valores normalizados listos para consultas SQL.
+        </div>
+      </div>
+
+      <h4>¿Por qué fracasan los sistemas del estado del arte (SoTA) previos?</h4>
+      <ul>
+        <li><strong>Sistemas Web/DOM (DOM-LM, Ceres):</strong> Asumen que los atributos están siempre en nodos hoja del árbol <code>HTML-DOM</code> y exigen entrenamiento supervisado en cada dominio. <strong>No funcionan en PDFs ni en texto plano (TXT)</strong>.</li>
+        <li><strong>Sistemas NLP / OpenIE clásicos (OpenIE6):</strong> Dependen de etiquetadores gramaticales (POS, NER, árboles de dependencias) que se degradan drásticamente en documentos largos (ej. informes médicos de 20 páginas de la FDA) y extraen centenares de tripletas sin normalizar (427 relaciones distintas en un solo informe FDA).</li>
+        <li><strong>Pipelines ETL manuales:</strong> Requieren expertos humanos programando reglas frágiles para cada fuente.</li>
+      </ul>
+    </div>
+
+    <!-- SECCIÓN 6: RELACIÓN CON LA ASIGNATURA -->
+    <div class="card">
+      <div class="card-title indigo">
+        <span>6. Relación con los Contenidos de la Asignatura</span>
+        <span class="sec-num">Apartado 6</span>
+      </div>
+      <p>El artículo conecta transversalmente los <strong>tres bloques</strong> de <em>Gestión de Sistemas de Datos Masivos</em> y amplía directamente lo estudiado en clase:</p>
+      <ul>
+        <li><strong>Bloque I — Fuentes de Datos y Web Scraping (<em>B1_1_4_Fuentres De Datos.pdf</em>):</strong>
+          <ul>
+            <li>Resuelve el problema de la diapositiva 6 (<em>"From unstructured data to actionable data"</em>) y el caso de estudio de la diapositiva 14 (<strong>informes médicos/FDA</strong> difíciles de estructurar).</li>
+            <li>Automatiza la programación de los parsers de <strong>Web Scraping</strong> vistos en las diapositivas 20–32: en vez de que el ingeniero escriba a mano código con <code>BeautifulSoup</code> (<code>soup.find_all</code>), <code>lxml</code>/XPath o expresiones regulares (<code>re.compile</code>), el LLM sintetiza automáticamente esas mismas funciones Python.</li>
+          </ul>
+        </li>
+        <li><strong>Bloque I — Arquitecturas ETL/ELT y Transformaciones (<em>B2_2_2_Gestión De Informacion.pdf</em>):</strong>
+          <ul>
+            <li>Compara empíricamente una transformación <strong>Data-driven pura</strong> (<em>Evaporate-Direct</em>: procesar el contenido documento a documento con Deep Learning/LLM, diap. 27) frente a una transformación <strong>Model-driven / basada en reglas</strong> sintetizada automáticamente (<em>Evaporate-Code+</em>, diap. 26).</li>
+            <li>Resuelve la desventaja clave de los sistemas ETL/ELT citada en la diapositiva 14: <em>"una función rara vez cubre el 100% de los casos potenciales"</em> mediante el ensamblado estadístico de múltiples funciones con <strong>Weak Supervision</strong>.</li>
+          </ul>
+        </li>
+        <li><strong>Bloque II — Recuperación de Información y LLMs (<em>2_1_1</em> y <em>2_2_RAG.pdf</em>):</strong>
+          <ul>
+            <li>Aplica <strong>Chunking</strong> para respetar la ventana de contexto del LLM, búsqueda léxica por palabras clave, vectorización <strong>TF-IDF + K-Means</strong> (Fig. 5) para agrupar documentos mezclados por fuente sin supervisión, y evalúa con <strong>Precision, Recall y F1</strong> analizando modos de fallo y alucinaciones del LLM.</li>
+          </ul>
+        </li>
+        <li><strong>Bloque III — Gobernanza e Interoperabilidad (<em>Block 3.1 / 3.2</em>):</strong>
+          <ul>
+            <li>Aborda el descubrimiento automático de esquemas (<em>Schema Discovery</em>) y la tensión entre extracción abierta (<em>OpenIE</em>, tripletas sin ontología previa) y cerrada (<em>ClosedIE</em>).</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ==================== COLUMNA 2: PROPUESTA Y ARQUITECTURA ==================== -->
+  <div class="col">
+
+    <!-- SECCIÓN 3: PROPUESTA -->
+    <div class="card">
+      <div class="card-title teal">
+        <span>3. Propuesta y Contribución Científica: EVAPORATE-CODE+</span>
+        <span class="sec-num">Apartado 3</span>
+      </div>
+      <p>
+        Los autores exploran el uso de <em>In-Context Learning</em> en <strong>Large Language Models (LLMs)</strong> mediante 6 plantillas de <em>prompts</em> agnósticos al dominio y descubren un nuevo espacio de compromiso (<em>trade-off</em>) entre <strong>Coste y Calidad</strong>:
+      </p>
+
+      <h4>Comparativa de las 3 Arquitecturas Propuestas</h4>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Estrategia</th>
+            <th>Mecanismo de Funcionamiento</th>
+            <th>Coste LLM (Tokens)</th>
+            <th>Calidad Media (Pair F1)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. Evaporate-Direct</strong></td>
+            <td>El LLM lee cada documento completo (en <em>chunks</em>) y extrae directamente pares <code>&lt;atributo&gt;: &lt;valor&gt;</code>.</td>
+            <td class="neg">Lineal O(n) · ¡Carísimo!<br>(1,1 M$ en Wikipedia)</td>
+            <td>56.6 F1<br>(Inconsistente entre docs)</td>
+          </tr>
+          <tr>
+            <td><strong>2. Evaporate-Code</strong></td>
+            <td>Muestrea <em>k ≪ n</em> docs (<em>k=10</em>) y pide al LLM <strong>1 función Python</strong> por atributo para ejecutarla a escala en CPU.</td>
+            <td class="pos">Sublineal O(m · k)<br>(Independiente de n)</td>
+            <td class="neg">42.8 F1 (-13.8 pts)<br>(Funciones frágiles)</td>
+          </tr>
+          <tr class="row-win">
+            <td><strong>3. Evaporate-Code+</strong></td>
+            <td>Sintetiza <strong>múltiples funciones candidatas diversas</strong> por atributo y agrega sus salidas con <strong>Weak Supervision</strong>.</td>
+            <td class="pos">Sublineal O(m · k)<br>(Reducción de 110×)</td>
+            <td class="pos">66.7 F1 (+10.1 pts vs Direct<br>y +25.1 pts vs Code)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- DIAGRAMA VISUAL DEL PIPELINE DE 3 ETAPAS -->
+      <div class="pipeline-box">
+        <strong>Arquitectura en 3 Etapas de EVAPORATE-CODE+ (Flujo de Ejecución):</strong>
+        <div class="pipe-steps">
+          <div class="pipe-step">
+            <div class="step-head">Etapa 1: Schema Synthesis</div>
+            Toma una muestra pequeña <em>D̃</em> de <em>k = 10</em> documentos. El LLM identifica atributos candidatos explícitos, calcula su frecuencia y los re-rankea priorizando atributos de alta cobertura (<em>head attributes</em>).
+          </div>
+          <div class="pipe-step">
+            <div class="step-head">Etapa 2: Diverse Code Synthesis</div>
+            Para cada atributo <em>aᵢ</em>, usa múltiples plantillas de prompt (<em>P_A</em> orientada a <code>regex</code> sin ejemplos y <em>P_B</em> con ejemplos que importan librerías como <code>BeautifulSoup</code>) sobre distintos pasajes para generar un conjunto diverso de funciones <em>F = {f₁, …, fₖ}</em>.
+            <div class="code-snippet">
+              <span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup<br>
+              <span class="kw">def</span> <span class="fn">get_draft_year</span>(doc):<br>
+              &nbsp;&nbsp;soup = BeautifulSoup(doc, <span class="st">"html.parser"</span>)<br>
+              &nbsp;&nbsp;<span class="kw">return</span> soup.find(...).text
+            </div>
+          </div>
+          <div class="pipe-step">
+            <div class="step-head">Etapa 3: Function Aggregation (Alg. 1)</div>
+            Ejecuta las funciones en CPU (0,00025 s/doc) y combina sus "votos" sin datos etiquetados usando el <strong>Algoritmo 1 de Supervisión Débil (Weak Supervision)</strong> para filtrar código erróneo y resolver conflictos.
+          </div>
+        </div>
+      </div>
+
+      <h4>Innovación Algorítmica: ¿Cómo adapta el Algoritmo 1 la Supervisión Débil (WS) a código generado por IA?</h4>
+      <p>La teoría clásica de <em>Weak Supervision</em> (Snorkel) asume funciones diseñadas por humanos con precisión &gt;50%, abstención explícita y clases discretas. En código generado por LLMs, <strong>el 51% de las funciones tiene &lt;50 F1 (y el 40% tiene &lt;25 F1)</strong>. El <strong>Algoritmo 1</strong> lo resuelve en 4 pasos sobre una muestra de validación <em>D_eval</em> (≤10 docs) comparando cada función <em>fⱼ</em> con la extracción directa del LLM <em>F</em>:</p>
+      <ul>
+        <li><strong>1. Manejo de Abstenciones (tasa <em>e</em>):</strong> Calcula la fracción <em>e</em> de documentos en <em>D_eval</em> donde el LLM extrae un valor no vacío. Si <em>e &gt; τ</em> (el atributo casi siempre existe), una salida vacía de <em>fⱼ</em> se interpreta como <em>abstención</em> (la función no supo extraerlo); si <em>e ≤ τ</em>, se interpreta como predicción legítima de "valor ausente".</li>
+        <li><strong>2. Puntuación y Filtrado de Funciones Ruidosas:</strong> Evalúa la calidad empírica <em>âⱼ</em> de cada función frente al LLM en <em>D_eval</em> y <strong>descarta todas las funciones con <em>âⱼ ≤ 0.5</em></strong>, garantizando el supuesto teórico de WS (Proposición 1 del paper).</li>
+        <li><strong>3. Discretización del Espacio Abierto de Texto:</strong> Como las funciones devuelven texto libre arbitrario, agrupa los valores únicos extraídos para cada documento en los <em>top-b buckets</em> más frecuentes y marca el resto como abstenciones.</li>
+        <li><strong>4. Modelo Gráfico Latente:</strong> Aprende sin etiquetas las precisiones y correlaciones entre las funciones filtradas <em>F'</em> para emitir el valor final consensuado <em>ŷᵢ</em> de cada celda de la tabla.</li>
+      </ul>
+
+      <div class="highlight-box">
+        <strong>Puntos de corte asintóticos (Crossover Points - Figura 3):</strong>
+        El coste de <em>Evaporate-Code+</em> crece con el nº de atributos <em>m</em>, no con el nº de documentos <em>n</em>. <strong>Supera en eficiencia a <em>Evaporate-Direct</em> a partir de solo <em>n &gt; 40</em> documentos</strong> (y siempre que el esquema tenga menos de <em>m &lt; 2.500</em> atributos).
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== COLUMNA 3: EVALUACIÓN Y RESULTADOS + ANÁLISIS CRÍTICO ==================== -->
+  <div class="col">
+
+    <!-- SECCIÓN 4: EVALUACIÓN Y RESULTADOS -->
+    <div class="card">
+      <div class="card-title slate">
+        <span>4. Evaluación Experimental y Resultados</span>
+        <span class="sec-num">Apartado 4</span>
+      </div>
+      <p>
+        <strong>Configuración experimental:</strong> Evaluado en <strong>16 benchmarks reales</strong> de <strong>5 dominios</strong> y <strong>3 formatos</strong>: <em>SWDE Movies</em> (8 webs HTML, 1.063–2.000 págs/web), <em>SWDE Universities</em> (5 webs HTML), <em>Wikipedia NBA Players</em> (HTML complejo con infoboxes), <em>Enron Emails</em> (500.000 correos TXT) y <em>FDA 510(k) Medical Device Reviews</em> (PDFs convertidos a TXT de ~20 páginas). Evaluado con 4 LLMs (<code>text-davinci-003</code>, <code>GPT-4</code>, <code>Claude-v1</code>, <code>Jurassic-2</code>) usando métricas <strong>Pair F1</strong> (OpenIE end-to-end) y <strong>Text F1</strong> (ClosedIE).
+      </p>
+
+      <!-- KPIs DESTACADOS -->
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="num">110×</div>
+          <div class="lbl">Reducción de Tokens<br>(y 378× en tamaño real)</div>
+        </div>
+        <div class="kpi">
+          <div class="num">+10.1 F1</div>
+          <div class="lbl">Mejora (+18%) sobre<br>Evaporate-Direct</div>
+        </div>
+        <div class="kpi">
+          <div class="num">+25.1 F1</div>
+          <div class="lbl">Mejora del Algoritmo 1<br>sobre Evaporate-Code</div>
+        </div>
+        <div class="kpi">
+          <div class="num">0.25 ms</div>
+          <div class="lbl">Tiempo de ejecución<br>por función/doc en CPU</div>
+        </div>
+      </div>
+
+      <h4>Resultado 1: Calidad (Pair F1) y Coste por cada 10.000 Documentos (Tabla 3)</h4>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Dataset (Formato)</th>
+            <th>Direct F1</th>
+            <th>Direct Coste ($)</th>
+            <th>Code+ F1</th>
+            <th>Code+ Coste ($)</th>
+            <th>Mejora F1</th>
+            <th>Ahorro Tokens</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>FDA 510(k)</strong> (PDF/TXT)</td>
+            <td>45.5</td>
+            <td>$2,900</td>
+            <td class="pos">62.8</td>
+            <td class="pos">$38</td>
+            <td class="pos">+17.3</td>
+            <td class="pos">77×</td>
+          </tr>
+          <tr>
+            <td><strong>Enron Emails</strong> (TXT)</td>
+            <td class="pos">93.8</td>
+            <td>$425</td>
+            <td>86.9</td>
+            <td class="pos">$12</td>
+            <td class="neg">-6.9</td>
+            <td class="pos">35×</td>
+          </tr>
+          <tr>
+            <td><strong>Wiki NBA</strong> (HTML complejo)</td>
+            <td>44.8</td>
+            <td>$13,000</td>
+            <td class="pos">68.2</td>
+            <td class="pos">$60</td>
+            <td class="pos">+23.4</td>
+            <td class="pos">217×</td>
+          </tr>
+          <tr>
+            <td><strong>SWDE Movie</strong> (8 webs HTML)</td>
+            <td>45.2</td>
+            <td>$5,660</td>
+            <td class="pos">56.8</td>
+            <td class="pos">$46</td>
+            <td class="pos">+11.6</td>
+            <td class="pos">123×</td>
+          </tr>
+          <tr>
+            <td><strong>SWDE Univ.</strong> (5 webs HTML)</td>
+            <td>53.8</td>
+            <td>$3,800</td>
+            <td class="pos">59.0</td>
+            <td class="pos">$38</td>
+            <td class="pos">+5.2</td>
+            <td class="pos">100×</td>
+          </tr>
+          <tr class="row-win">
+            <td><strong>Promedio Global</strong></td>
+            <td>56.6</td>
+            <td>$5,157 (258M tok)</td>
+            <td>66.7</td>
+            <td>$39 (1.9M tok)</td>
+            <td class="pos">+10.1 (+18%)</td>
+            <td class="pos">110×</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Resultado 2: Comparación contra el Estado del Arte Supervisado y Ablación (Tablas 2 y 4)</h4>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <span><strong>DOM-LM</strong> (SoTA entrenado)</span>
+          <div class="bar-track"><div class="bar-fill bf-slate" style="width: 70.0%;"></div></div>
+          <span>70.0 F1</span>
+        </div>
+        <div class="bar-row">
+          <span><strong>Evaporate-Code+</strong> (0 train)</span>
+          <div class="bar-track"><div class="bar-fill bf-green" style="width: 76.6%;"></div></div>
+          <span class="pos">76.6 F1</span>
+        </div>
+        <div class="bar-row">
+          <span><strong>Ablación:</strong> Majority Vote</span>
+          <div class="bar-track"><div class="bar-fill bf-slate" style="width: 56.2%;"></div></div>
+          <span>56.2 F1</span>
+        </div>
+        <div class="bar-row">
+          <span><strong>Ablación:</strong> WS estándar</span>
+          <div class="bar-track"><div class="bar-fill bf-blue" style="width: 57.7%;"></div></div>
+          <span>57.7 F1</span>
+        </div>
+        <div class="bar-row">
+          <span><strong>Ablación:</strong> Alg. 1 Completo</span>
+          <div class="bar-track"><div class="bar-fill bf-green" style="width: 66.7%;"></div></div>
+          <span class="pos">66.7 F1</span>
+        </div>
+      </div>
+      <p style="font-size: 7.5pt; color: #475569;">
+        *Nota: En SWDE ClosedIE (media Movie/Univ), <em>Evaporate-Code+</em> (76.6 Text F1) supera a <em>DOM-LM</em> (70.0) y <em>RoBERTa-Structural</em> (47.1) sin usar ningún dato de entrenamiento del dominio.
+      </p>
+    </div>
+
+    <!-- SECCIÓN 5: ANÁLISIS CRÍTICO -->
+    <div class="card">
+      <div class="card-title amber">
+        <span>5. Análisis Crítico: Ventajas, Limitaciones y Retos Abiertos</span>
+        <span class="sec-num">Apartado 5</span>
+      </div>
+      <ul>
+        <li><strong>¿Por qué <em>Evaporate-Code+</em> supera en calidad al propio LLM directo (<em>Direct</em>)?</strong>
+          Al analizar los fallos de <em>Evaporate-Direct</em> en informes médicos FDA, el LLM olvida de media el <strong>27,5% de los atributos</strong> por documento, <strong>alucina 9,7 atributos/valores inexistentes</strong> por informe y renombra el mismo atributo de 4 formas distintas (<em>"classification"</em>, <em>"device classification"</em>, <em>"regulatory info"</em>). En cambio, las funciones Python sintetizadas imponen <strong>consistencia determinista y alta precisión</strong> (78,5% Precision frente a 58,9% Recall en Tabla 1).</li>
+        <li><strong>Limitación 1 — Textos con baja regularidad sintáctica (Caso Enron):</strong>
+          En <em>Enron Emails</em>, <em>Evaporate-Direct</em> (93.8 F1) supera a <em>Evaporate-Code+</em> (86.9 F1). Cuando el atributo requiere comprensión semántica libre en vez de patrones estructurales/HTML/regex repetitivos, las funciones Python pierden cobertura.</li>
+        <li><strong>Limitación 2 — Escalabilidad en esquemas ultra-anchos y dependencia del oráculo:</strong>
+          Si el esquema supera <em>m &gt; 2.500</em> atributos, sintetizar código por atributo deja de ser rentable frente a <em>Direct</em>. Además, el Algoritmo 1 usa al propio LLM en <em>D_eval</em> como pseudo-ground-truth: si el LLM falla sistemáticamente en un atributo complejo (tasa de error <em>e</em> alta en Proposición 1), filtra todas las funciones candidatas y omite la columna.</li>
+      </ul>
+      <div class="warn-box">
+        <strong>Cuestiones abiertas identificadas por el grupo:</strong>
+        (1) <em>Arquitectura Híbrida Adaptativa:</em> usar <em>Evaporate-Code+</em> para atributos con estructura regular y <em>Evaporate-Direct</em> solo en las celdas donde las funciones se abstienen;
+        (2) <em>Detección de Schema Drift:</em> ¿cómo detectar automáticamente que una web ha cambiado su DOM para re-sintetizar solo las funciones afectadas?;
+        (3) <em>Seguridad en ejecución:</em> ejecutar código Python generado por un LLM exige entornos <em>sandbox</em> aislados.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
