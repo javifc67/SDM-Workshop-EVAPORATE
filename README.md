@@ -116,3 +116,63 @@ Validan la propuesta en dos regímenes: **ClosedIE** (esquema de atributos dado)
 1. **Automatiza la programación manual de Web Scraping:** Sustituye la escritura manual de parsers en `BeautifulSoup` y `regex` por síntesis automática de código mediante LLMs.
 2. **Resuelve la limitación de los sistemas ETL de la diapositiva 14 (`B2_2_2_Gestión De Informacion.pdf`):** Donde en clase vimos que *"una función rara vez cubre el 100% de los casos potenciales"*, el paper demuestra cómo combinar estadísticamente múltiples funciones imperfectas con **Supervisión Débil** para pasar de `42.8` a `66.7 Pair F1`.
 3. **Une los paradigmas *Data-driven* y *Model-driven*:** Usa un modelo *Data-driven* (el LLM) en tiempo de compilación para sintetizar transformaciones *Model-driven* (código Python) ejecutables a escala en CPU.
+
+---
+
+## 🧪 7. Aportación y Crítica Científica del Grupo: Hipótesis y Diseño Experimental de Medición
+
+### 7.1. Crítica Fundamentada al Artículo (El Cuello de Botella del Recall y la Dicotomía Rígida)
+Al analizar en profundidad la **Tabla 1 (página 7)** y la **Tabla 3 (página 8)** del artículo original, detectamos una debilidad estructural en `Evaporate-Code+`:
+1. **Asimetría extrema entre Precisión y Recall:** En promedio sobre los 16 benchmarks en *OpenIE*, `Evaporate-Code+` logra una **Precisión muy alta (`78.5%`)**, pero un **Recall bajo (`58.9%`)**, lo que significa que **las funciones Python generadas dejan escapar el `41,1%` de los valores reales presentes en los documentos**.
+2. **Incapacidad de las funciones en casos borde y texto libre (El Caso Enron):** En *Enron Emails* (Tabla 3), `Evaporate-Code+` (`86.9 Pair F1`) cae **$-6,9$ puntos F1** por debajo de `Evaporate-Direct` (`93.8 Pair F1`). Esto ocurre porque el sistema impone una decisión binaria rígida para todo el Data Lake: o se usa código Python en el 100% de los documentos o se usa el LLM directo en el 100%. Cuando un documento presenta una variación sintáctica no vista en los $k=10$ documentos de muestra o redacta el atributo en lenguaje natural libre, todas las funciones filtradas $F'$ devuelven cadena vacía (`ABSTAIN`) y el sistema deja la celda en `NULL`.
+3. **Desperdicio de funciones casi-correctas en $D_{\text{eval}}$:** En la Sección 3.3, los autores reportan que **el 51% de las funciones sintetizadas por el LLM obtiene $<50\text{ F1}$** y el Algoritmo 1 simplemente las descarta ($\hat{a}_j \le 0.5$), sin intentar corregirlas con los propios contraejemplos ya calculados en $D_{\text{eval}}$.
+
+---
+
+### 7.2. Formulación de Nuestras Dos Hipótesis de Mejora ($H_1$ y $H_2$)
+
+#### 🔹 Hipótesis Principal $H_1$: Arquitectura en Cascada Guiada por Abstención (`EVAPORATE-Hybrid`)
+> **Enunciado de la Hipótesis $H_1$:**
+> *"Si ejecutamos `Evaporate-Code+` en CPU como extractor primario sobre todo el Data Lake, pero utilizamos la matriz de votos $\Psi$ y la tasa de presencia $e$ del Algoritmo 1 como un **enrutador (router)** para invocar selectivamente al LLM con el esquema ya fijado (**Closed-Schema Fallback**) únicamente en aquellas celdas $(d_i, a_j)$ donde todas las funciones filtradas $F'$ se abstienen y el atributo tiene alta presencia ($e_j > \tau$), o donde la confianza posterior del modelo gráfico sea inferior a un umbral $P(\hat{y}_{i,j} \mid \Psi_{i,j}) < \theta$, entonces **incrementaremos significativamente el Recall y el Pair F1 global (cerrando además la brecha en textos libres como Enron)**, manteniendo un ahorro de tokens superior a $30\times$ respecto a `Evaporate-Direct`."*
+
+- **¿Por qué nuestro fallback NO sufre las alucinaciones de `Evaporate-Direct`?**
+  Porque `Evaporate-Direct` fallaba al inventarse nombres de atributos distintos en cada documento (4 variantes por columna y 9,7 alucinaciones por informe en FDA). En `EVAPORATE-Hybrid`, el esquema $A$ ya ha sido descubierto y normalizado por `Evaporate-Code+`; el LLM solo se invoca sobre el *chunk* específico que contiene la palabra clave del atributo huérfano para rellenar una celda concreta de una columna ya fijada.
+
+#### 🔹 Hipótesis Secundaria $H_2$: Refinamiento de Código Guiado por Contraejemplos (`EVAPORATE-Refine`)
+> **Enunciado de la Hipótesis $H_2$:**
+> *"Si en lugar de descartar directamente el 51% de las funciones con calidad empírica $\hat{a}_j \le 0.5$ en la muestra de validación $D_{\text{eval}}$ ($|D_{\text{eval}}| = 10$), re-prompteamos al LLM **una sola vez** pasándole el código fallido junto con el contraejemplo exacto $d \in D_{\text{eval}}$ donde $f_j(d) \neq \mathcal{F}(d)$, aumentaremos la tasa de supervivencia de funciones válidas ($\hat{a}_j > 0.5$) del $49\%$ a $>70\%$ y subiremos el **Text F1** sin depender del tamaño $n$ del Data Lake (coste constante $O(m \cdot k)$)."*
+
+---
+
+### 7.3. ¿Cómo Vamos a Medirlo? (Diseño Experimental y Métricas de Verificación)
+
+Para demostrar científicamente si nuestras hipótesis mejoran los resultados del paper, definimos el siguiente protocolo experimental reproducible (implementado en [`experimento_hipotesis_evaporate.py`](./experimento_hipotesis_evaporate.py)):
+
+1. **Variables Independientes (Parámetros de Control):**
+   - **Presupuesto máximo de enrutamiento $\beta \in \{0\%, 5\%, 10\%, 15\%, 20\%\}$** de celdas con abstención enviadas al LLM (controlado por el umbral de confianza $\theta \in [0.5, 0.95]$ y el umbral de presencia $\tau = 0.8$).
+   - **Número de rondas de refinamiento $r \in \{0, 1\}$** sobre los 10 documentos de $D_{\text{eval}}$.
+
+2. **Baselines de Comparación:**
+   - **Baseline 1 (`Evaporate-Code+` puro, $\beta = 0\%$):** `66.7 Pair F1` (`78.5%` Precision, `58.9%` Recall), coste `$39` / `1.9M tokens` por 10k docs.
+   - **Baseline 2 (`Evaporate-Direct` puro, $\beta = 100\%$):** `56.6 Pair F1`, coste `$5,157` / `258M tokens` por 10k docs.
+   - **Baseline 3 (`Random-Fallback`):** Enviar exactamente el mismo porcentaje $\beta\%$ de celdas al LLM pero elegidas **al azar** en lugar de guiadas por la abstención/entropía del Algoritmo 1 (control de ablación para demostrar que la mejora proviene del criterio de enrutamiento de $H_1$).
+
+3. **Métricas Cuantitativas de Éxito:**
+   - **Métrica 1 — Ganancia de Cobertura y Calidad ($\Delta \text{Recall}$ y $\Delta \text{Pair F1}$):** Incremento neto en Recall y Pair F1 sobre los 5 dominios. *Criterio de validación:* $\Delta \text{Pair F1} \ge +5.0$ puntos de media y recuperación del rendimiento en *Enron Emails* por encima de `90.0 F1`.
+   - **Métrica 2 — Eficiencia Marginal de Tokens ($\text{ROI}_{\text{tokens}} = \frac{\Delta \text{Pair F1}}{\Delta \text{Millones de Tokens}}$) y Factor de Ahorro Neto ($\frac{\text{Tokens}(\text{Direct})}{\text{Tokens}(\text{Hybrid})}$):** *Criterio de validación:* Mantener un ahorro $\ge 30\times$ frente a `Evaporate-Direct` situándose por encima de la frontera de Pareto de la Figura 3 del paper.
+   - **Métrica 3 — Tasa de Supervivencia de Funciones ($\text{SR} = \frac{|F'|}{|\mathcal{F}_{\text{cand}}|}$, para $H_2$):** Porcentaje de funciones generadas que superan el filtro $\hat{a}_j > 0.5$ en $D_{\text{eval}}$ antes ($r=0$) y después ($r=1$) del refinamiento con contraejemplos.
+
+---
+
+### 7.4. Resultados de la Evaluación Cuantitativa (`experimento_hipotesis_evaporate.py`)
+
+Al ejecutar el modelo analítico sobre las tasas reales de Precisión, Recall y consumo de tokens de los 5 dominios del paper (Tabla 1 y Tabla 3), obtenemos:
+
+| Benchmark (Formato) | `Direct` (Pair F1) | `Code+` (Pair F1) | **`EVAPORATE-Hybrid` ($H_1$)** | **Mejora ($\Delta$ F1)** | Coste `Code+` (10k docs) | Coste `Hybrid` (10k docs) | **Ahorro vs `Direct`** |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **FDA 510(k)** (PDF/TXT) | 45.5 | 62.8 | **71.0** | **+8.2** | \$38 | \$91 | **31.7×** |
+| **Enron Emails** (TXT) | 93.8 | 86.9 | **90.2** | **+3.3** | \$12 | \$19 | **22.7×** |
+| **Wiki NBA** (HTML complejo) | 44.8 | 68.2 | **76.0** | **+7.8** | \$60 | \$207 | **62.9×** |
+| **SWDE Movie** (8 webs HTML) | 45.2 | 56.8 | **69.0** | **+12.2** | \$46 | \$155 | **36.5×** |
+| **SWDE Univ.** (5 webs HTML) | 53.8 | 59.0 | **68.8** | **+9.8** | \$38 | \$102 | **37.2×** |
+| **Promedio Global** | **56.6** | **66.7** | **75.0** | **+8.3 pts** | **\$39** | **\$115** | **38.2×** |
